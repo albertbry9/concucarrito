@@ -1,3 +1,4 @@
+import 'package:concurrente/src/screens/auth/widgets/login_form.dart';
 import 'package:concurrente/src/widgets/fake_taxi_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -14,19 +15,24 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin {
   AnimationController animationController;
   Animation<double> animation;
   String buttonTitle = 'Get Started';
+  bool hideForm = true;
 
   @override
   void initState() {
     super.initState();
     animationController =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
-    
+
     animation = Tween<double>(begin: 0, end: -200).animate(animationController)
-    ..addListener(() {
-      setState(() {
-        buttonTitle = 'Log In';
+      ..addListener(() {
+        setState(() {
+          buttonTitle = 'Log In';
+          if (animation.isCompleted) {
+            print('show');
+            hideForm = false;
+          }
+        });
       });
-    });
   }
 
   @override
@@ -52,15 +58,17 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin {
                 },
               )),
             ),
+            Offstage(
+              offstage: hideForm,
+              child: LoginForm(),
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child: FakeTaxiButton(
                 title: buttonTitle,
                 onPressed: () {
                   setState(() {
-                    print('hola');
                     animationController.forward();
-                    // offsetY = -200;
                   });
                 },
               ),
@@ -69,5 +77,10 @@ class LoginState extends State<Login> with SingleTickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }
